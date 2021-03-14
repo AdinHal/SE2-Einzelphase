@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.io.StringBufferInputStream;
+import java.io.StringReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -28,9 +30,9 @@ public class MainActivity extends AppCompatActivity {
     public String msg;
     public String response;
     public TextView srvr;
-    public EditText MatrikelNummer;
+    //public EditText MatrikelNummer;
     public ArrayList<Object>userinput=new ArrayList<>();
-    public InputStream inputStream;
+    public Reader inputStream;
     public BufferedReader inFromUser,inFromServer;
     public Socket socket;
     public DataOutputStream outToServer;
@@ -39,9 +41,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        MatrikelNummer=findViewById(R.id.EditText);
+
         srvr=findViewById(R.id.serverText);
-        msg=MatrikelNummer.getText().toString();
 
     }
 
@@ -101,18 +102,19 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void tcptest(View view) {
-
+        EditText MatrikelNummer=(EditText)findViewById(R.id.EditText);
+        msg=MatrikelNummer.getText().toString();
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    inputStream = new ByteArrayInputStream(msg.getBytes());
-                    inFromUser=new BufferedReader(new InputStreamReader(inputStream));
+                    inputStream = new StringReader(msg);
+                    inFromUser=new BufferedReader(inputStream);
                     socket = new Socket("se2-isys.aau.at", 53212);
                     outToServer=new DataOutputStream(socket.getOutputStream());
                     inFromServer=new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     sentence=inFromUser.readLine();
-                    outToServer.writeBytes(sentence+'\n');
+                    outToServer.writeBytes(sentence+"\n");
                     response=inFromServer.readLine();
                     temp=response;
                     socket.close();
